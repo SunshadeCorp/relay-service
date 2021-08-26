@@ -4,7 +4,7 @@ import sys
 from PyQt5 import QtWidgets
 from gpiozero import DigitalOutputDevice
 
-from test import Ui_MainWindow
+from ui.test import Ui_MainWindow
 
 
 class MainWindow(Ui_MainWindow):
