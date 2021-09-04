@@ -50,9 +50,9 @@ class MainWindow(Ui_MainWindow):
 
 
 if __name__ == '__main__':
-    out5 = DigitalOutputDevice(5)
+    out5 = DigitalOutputDevice(12)
     out6 = DigitalOutputDevice(6)
-    out1 = DigitalOutputDevice(12)
+    out1 = DigitalOutputDevice(5)
     out2 = DigitalOutputDevice(13)
     out3 = DigitalOutputDevice(17)
     out4 = DigitalOutputDevice(18)
