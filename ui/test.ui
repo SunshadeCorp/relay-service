@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>GPIO-Switch</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
@@ -19,6 +19,62 @@
      <widget class="QPushButton" name="pushButton">
       <property name="text">
        <string>PushButton1</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="1">
+     <widget class="QLabel" name="label">
+      <property name="text">
+       <string>Off</string>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="1">
+     <widget class="QLabel" name="label_5">
+      <property name="text">
+       <string>Off</string>
+      </property>
+     </widget>
+    </item>
+    <item row="5" column="1">
+     <widget class="QLabel" name="label_6">
+      <property name="text">
+       <string>Off</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="1">
+     <widget class="QLabel" name="label_3">
+      <property name="text">
+       <string>Off</string>
+      </property>
+     </widget>
+    </item>
+    <item row="5" column="0">
+     <widget class="QPushButton" name="pushButton_6">
+      <property name="text">
+       <string>PushButton6</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="1">
+     <widget class="QLabel" name="label_2">
+      <property name="text">
+       <string>Off</string>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="0">
+     <widget class="QPushButton" name="pushButton_4">
+      <property name="text">
+       <string>PushButton4</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="0">
+     <widget class="QPushButton" name="pushButton_3">
+      <property name="text">
+       <string>PushButton3</string>
       </property>
      </widget>
     </item>
@@ -36,48 +92,6 @@
       </property>
      </widget>
     </item>
-    <item row="5" column="0">
-     <widget class="QPushButton" name="pushButton_6">
-      <property name="text">
-       <string>PushButton6</string>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="0">
-     <widget class="QPushButton" name="pushButton_3">
-      <property name="text">
-       <string>PushButton3</string>
-      </property>
-     </widget>
-    </item>
-    <item row="3" column="0">
-     <widget class="QPushButton" name="pushButton_4">
-      <property name="text">
-       <string>PushButton4</string>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="1">
-     <widget class="QLabel" name="label">
-      <property name="text">
-       <string>Off</string>
-      </property>
-     </widget>
-    </item>
-    <item row="1" column="1">
-     <widget class="QLabel" name="label_2">
-      <property name="text">
-       <string>Off</string>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="1">
-     <widget class="QLabel" name="label_3">
-      <property name="text">
-       <string>Off</string>
-      </property>
-     </widget>
-    </item>
     <item row="3" column="1">
      <widget class="QLabel" name="label_4">
       <property name="text">
@@ -85,17 +99,10 @@
       </property>
      </widget>
     </item>
-    <item row="4" column="1">
-     <widget class="QLabel" name="label_5">
+    <item row="6" column="0">
+     <widget class="QPushButton" name="pushButtonTurnOnPrecharge">
       <property name="text">
-       <string>Off</string>
-      </property>
-     </widget>
-    </item>
-    <item row="5" column="1">
-     <widget class="QLabel" name="label_6">
-      <property name="text">
-       <string>Off</string>
+       <string>turn on precharge</string>
       </property>
      </widget>
     </item>
