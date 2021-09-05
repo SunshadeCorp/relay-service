@@ -18,7 +18,7 @@
     <item row="0" column="0">
      <widget class="QPushButton" name="pushButton">
       <property name="text">
-       <string>PushButton1</string>
+       <string>Relais 1</string>
       </property>
      </widget>
     </item>
@@ -53,7 +53,7 @@
     <item row="5" column="0">
      <widget class="QPushButton" name="pushButton_6">
       <property name="text">
-       <string>PushButton6</string>
+       <string>Relais 6</string>
       </property>
      </widget>
     </item>
@@ -67,28 +67,28 @@
     <item row="3" column="0">
      <widget class="QPushButton" name="pushButton_4">
       <property name="text">
-       <string>PushButton4</string>
+       <string>Relais 4 - Solar 1</string>
       </property>
      </widget>
     </item>
     <item row="2" column="0">
      <widget class="QPushButton" name="pushButton_3">
       <property name="text">
-       <string>PushButton3</string>
+       <string>Relais 3</string>
       </property>
      </widget>
     </item>
     <item row="1" column="0">
      <widget class="QPushButton" name="pushButton_2">
       <property name="text">
-       <string>PushButton2</string>
+       <string>Relais 2</string>
       </property>
      </widget>
     </item>
     <item row="4" column="0">
      <widget class="QPushButton" name="pushButton_5">
       <property name="text">
-       <string>PushButton5</string>
+       <string>Relais 5 - Solar 2</string>
       </property>
      </widget>
     </item>
@@ -114,7 +114,7 @@
      <x>0</x>
      <y>0</y>
      <width>481</width>
-     <height>26</height>
+     <height>21</height>
     </rect>
    </property>
   </widget>
