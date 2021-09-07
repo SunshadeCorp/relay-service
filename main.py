@@ -4,9 +4,24 @@ from time import sleep
 
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import QTimer
-from gpiozero import DigitalOutputDevice
+from gpiozero import DigitalOutputDevice, BadPinFactory
 
 from ui.test import Ui_MainWindow
+
+
+class VirtualDigitalOutputDevice:
+    def __init__(self, pin):
+        self.pin = pin
+        self.is_active = False
+
+    def on(self):
+        self.is_active = True
+
+    def toggle(self):
+        self.is_active = not self.is_active
+
+    def off(self):
+        self.is_active = False
 
 
 class MainWindow(Ui_MainWindow):
@@ -50,6 +65,7 @@ class MainWindow(Ui_MainWindow):
         self.label_4.setText('On' if out4.is_active else 'Off')
         self.label_5.setText('On' if out5.is_active else 'Off')
         self.label_6.setText('On' if out6.is_active else 'Off')
+        self.main_window.repaint()
 
     def button1(self):
         out1.toggle()
@@ -77,12 +93,21 @@ class MainWindow(Ui_MainWindow):
 
 
 if __name__ == '__main__':
-    out5 = DigitalOutputDevice(12)
-    out6 = DigitalOutputDevice(6)
-    out1 = DigitalOutputDevice(5)
-    out2 = DigitalOutputDevice(13)
-    out3 = DigitalOutputDevice(17)
-    out4 = DigitalOutputDevice(18)
+    try:
+        out5 = DigitalOutputDevice(12)
+        out6 = DigitalOutputDevice(6)
+        out1 = DigitalOutputDevice(5)
+        out2 = DigitalOutputDevice(13)
+        out3 = DigitalOutputDevice(17)
+        out4 = DigitalOutputDevice(18)
+    except BadPinFactory as e:
+        print(f'{e}')
+        out5 = VirtualDigitalOutputDevice(12)
+        out6 = VirtualDigitalOutputDevice(6)
+        out1 = VirtualDigitalOutputDevice(5)
+        out2 = VirtualDigitalOutputDevice(13)
+        out3 = VirtualDigitalOutputDevice(17)
+        out4 = VirtualDigitalOutputDevice(18)
 
     main_window = MainWindow()
     main_window.show()
