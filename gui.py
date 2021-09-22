@@ -7,21 +7,7 @@ from PyQt5.QtCore import QTimer
 from gpiozero import DigitalOutputDevice, BadPinFactory
 
 from ui.test import Ui_MainWindow
-
-
-class VirtualDigitalOutputDevice:
-    def __init__(self, pin):
-        self.pin = pin
-        self.is_active = False
-
-    def on(self):
-        self.is_active = True
-
-    def toggle(self):
-        self.is_active = not self.is_active
-
-    def off(self):
-        self.is_active = False
+from virtual_digital_output_device import VirtualDigitalOutputDevice
 
 
 class MainWindow(Ui_MainWindow):
