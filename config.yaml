@@ -17,3 +17,5 @@ relays:
   6:
     name: Relay 6
     pin: 6
+kill_switch:
+  pin: 16
