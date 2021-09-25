@@ -115,6 +115,8 @@ class GpioService:
                         self.relays[1].on()
                         sleep(0.5)
                         self.relays[3].off()
+                    if self.kill_switch.is_active:
+                        self.kill_switch_pressed()
 
     def mqtt_on_message(self, client: mqtt.Client, userdata: Any, msg: mqtt.MQTTMessage):
         if msg.topic.startswith('master/relays/'):
