@@ -7,7 +7,7 @@ from typing import Dict, Any
 
 import paho.mqtt.client as mqtt
 import yaml
-from gpiozero import DigitalOutputDevice, BadPinFactory
+from gpiozero import DigitalOutputDevice, BadPinFactory, DigitalInputDevice
 
 from virtual_digital_output_device import VirtualDigitalOutputDevice
 
@@ -60,10 +60,23 @@ class GpioService:
         self.mqtt_client.on_connect = self.mqtt_on_connect
         self.mqtt_client.on_message = self.mqtt_on_message
 
+        self.kill_switch = DigitalInputDevice(relay_config['kill_switch']['pin'],
+                                              pull_up=False, active_state=True, bounce_time=0.1)
+        self.kill_switch.when_activated = self.kill_switch_pressed
+        self.kill_switch.when_deactivated = self.kill_switch_released
+
         for relay_number in self.relays:
             self.relays[relay_number] = Relay.from_dict(relay_number, self.mqtt_client, self.relays)
 
         self.mqtt_client.connect(host='127.0.0.1', port=1883, keepalive=60)
+
+    def kill_switch_pressed(self):
+        for relay_number in self.relays:
+            self.relays[relay_number].off()
+        self.mqtt_client.publish('master/relays/kill_switch', 'pressed')
+
+    def kill_switch_released(self):
+        self.mqtt_client.publish('master/relays/kill_switch', 'released')
 
     @staticmethod
     def get_config() -> Dict:
@@ -86,6 +99,7 @@ class GpioService:
             self.relays[relay_number].subscribe()
             self.relays[relay_number].publish_state()
         self.mqtt_client.subscribe('master/relays/precharge')
+        self.mqtt_client.publish('master/relays/kill_switch', 'pressed' if self.kill_switch.is_active else 'released')
 
     def precharge(self):
         if not self.precharge_lock.locked():
