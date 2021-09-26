@@ -45,7 +45,7 @@ class Relay:
         return 'on' if self.is_active() else 'off'
 
     def publish_state(self):
-        self.client.publish(f'master/relays/{self.number}', self.state())
+        self.client.publish(f'master/relays/{self.number}', self.state(), retain=True)
 
     def subscribe(self):
         self.client.subscribe(f'master/relays/{self.number}/set')
@@ -70,15 +70,16 @@ class GpioService:
             self.relays[relay_number] = Relay.from_dict(relay_number, self.mqtt_client, self.relays)
 
         self.mqtt_client.username_pw_set(credentials['username'], credentials['password'])
+        self.mqtt_client.will_set('master/relays/available', 'offline', retain=True)
         self.mqtt_client.connect(host=config['mqtt_server'], port=config['mqtt_port'], keepalive=60)
 
     def kill_switch_pressed(self):
         for relay_number in self.relays:
             self.relays[relay_number].off()
-        self.mqtt_client.publish('master/relays/kill_switch', 'pressed')
+        self.mqtt_client.publish('master/relays/kill_switch', 'pressed', retain=True)
 
     def kill_switch_released(self):
-        self.mqtt_client.publish('master/relays/kill_switch', 'released')
+        self.mqtt_client.publish('master/relays/kill_switch', 'released', retain=True)
 
     @staticmethod
     def get_config(filename: str) -> Dict:
@@ -101,7 +102,9 @@ class GpioService:
             self.relays[relay_number].subscribe()
             self.relays[relay_number].publish_state()
         self.mqtt_client.subscribe('master/relays/precharge')
-        self.mqtt_client.publish('master/relays/kill_switch', 'pressed' if self.kill_switch.is_active else 'released')
+        self.mqtt_client.publish('master/relays/kill_switch', 'pressed' if self.kill_switch.is_active else 'released',
+                                 retain=True)
+        self.mqtt_client.publish('master/relays/available', 'online', retain=True)
 
     def precharge(self):
         if not self.precharge_lock.locked():
