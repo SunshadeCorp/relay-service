@@ -60,8 +60,7 @@ class GpioService:
         self.mqtt_client.on_connect = self.mqtt_on_connect
         self.mqtt_client.on_message = self.mqtt_on_message
 
-        self.kill_switch = DigitalInputDevice(relay_config['kill_switch']['pin'],
-                                              pull_up=False, active_state=True, bounce_time=0.1)
+        self.kill_switch = DigitalInputDevice(relay_config['kill_switch']['pin'], pull_up=False, bounce_time=0.1)
         self.kill_switch.when_activated = self.kill_switch_pressed
         self.kill_switch.when_deactivated = self.kill_switch_released
 
