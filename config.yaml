@@ -1,21 +1,21 @@
 relays:
   1:
     name: Relay 1 - Battery
-    pin: 5
+    pin: 12
   2:
     name: Relay 2 - Battery
     pin: 13
   3:
     name: Relay 3 - Precharge Battery
-    pin: 17
+    pin: 18
   4:
     name: Relay 4 - Solar 1
-    pin: 18
+    pin: 19
   5:
     name: Relay 5 - Solar 2
-    pin: 12
+    pin: 20
   6:
     name: Relay 6
-    pin: 6
+    pin: 24
 kill_switch:
   pin: 16
