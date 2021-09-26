@@ -53,21 +53,24 @@ class Relay:
 
 
 class GpioService:
-    def __init__(self, relay_config: Dict):
-        self.relays = relay_config['relays']
+    def __init__(self):
+        config = self.get_config('config.yaml')
+        credentials = self.get_config('credentials.yaml')
+        self.relays = config['relays']
         self.precharge_lock = Lock()
         self.mqtt_client = mqtt.Client()
         self.mqtt_client.on_connect = self.mqtt_on_connect
         self.mqtt_client.on_message = self.mqtt_on_message
 
-        self.kill_switch = DigitalInputDevice(relay_config['kill_switch']['pin'], pull_up=False, bounce_time=0.1)
+        self.kill_switch = DigitalInputDevice(config['kill_switch']['pin'], pull_up=False, bounce_time=0.1)
         self.kill_switch.when_activated = self.kill_switch_pressed
         self.kill_switch.when_deactivated = self.kill_switch_released
 
         for relay_number in self.relays:
             self.relays[relay_number] = Relay.from_dict(relay_number, self.mqtt_client, self.relays)
 
-        self.mqtt_client.connect(host='127.0.0.1', port=1883, keepalive=60)
+        self.mqtt_client.username_pw_set(credentials['username'], credentials['password'])
+        self.mqtt_client.connect(host=config['mqtt_server'], port=config['mqtt_port'], keepalive=60)
 
     def kill_switch_pressed(self):
         for relay_number in self.relays:
@@ -78,8 +81,8 @@ class GpioService:
         self.mqtt_client.publish('master/relays/kill_switch', 'released')
 
     @staticmethod
-    def get_config() -> Dict:
-        with open(Path(__file__).parent / 'config.yaml', 'r') as file:
+    def get_config(filename: str) -> Dict:
+        with open(Path(__file__).parent / filename, 'r') as file:
             try:
                 config = yaml.safe_load(file)
                 print(config)
@@ -137,5 +140,5 @@ class GpioService:
 
 
 if __name__ == '__main__':
-    gpio_service = GpioService(relay_config=GpioService.get_config())
+    gpio_service = GpioService()
     gpio_service.loop()
