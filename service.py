@@ -67,7 +67,7 @@ class GpioService:
         for relay_number in self.relays:
             self.relays[relay_number] = Relay.from_dict(relay_number, self.mqtt_client, self.relays)
 
-        self.mqtt_client.connect(host='127.0.0.1', port=1883, keepalive=60)
+        self.mqtt_client.connect(host='mosquitto', port=1883, keepalive=60)
 
     def kill_switch_pressed(self):
         for relay_number in self.relays:
