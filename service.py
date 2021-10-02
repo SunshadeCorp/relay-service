@@ -72,8 +72,8 @@ class GpioService:
         self.mqtt_client.on_message = self.mqtt_on_message
 
         self.kill_switch = DigitalInputDevice(config['kill_switch']['pin'], pull_up=False, bounce_time=0.1)
-        self.kill_switch.when_activated = self.kill_switch_pressed
-        self.kill_switch.when_deactivated = self.kill_switch_released
+        self.kill_switch.when_activated = self.kill_switch_released
+        self.kill_switch.when_deactivated = self.kill_switch_pressed
 
         for relay_number in self.relays:
             self.relays[relay_number] = Relay.from_dict(relay_number, self.mqtt_client, self.relays)
@@ -111,7 +111,7 @@ class GpioService:
             self.relays[relay_number].subscribe()
             self.relays[relay_number].publish_state()
         self.mqtt_client.subscribe('master/relays/precharge')
-        self.mqtt_client.publish('master/relays/kill_switch', 'pressed' if self.kill_switch.is_active else 'released',
+        self.mqtt_client.publish('master/relays/kill_switch', 'released' if self.kill_switch.is_active else 'pressed',
                                  retain=True)
         self.mqtt_client.publish('master/relays/available', 'online', retain=True)
 
@@ -129,7 +129,7 @@ class GpioService:
                         self.relays[1].on()
                         sleep(0.5)
                         self.relays[3].off()
-                    if self.kill_switch.is_active:
+                    if not self.kill_switch.is_active:
                         self.kill_switch_pressed()
 
     def mqtt_on_message(self, client: mqtt.Client, userdata: Any, msg: mqtt.MQTTMessage):
@@ -138,7 +138,7 @@ class GpioService:
             relay_string = message_topic[message_topic.find('/') + 1:]
             relay_number: int = -1
             if relay_string.isnumeric():
-                relay_number = int(relay_number)
+                relay_number = int(relay_string)
             else:
                 if relay_string == 'battery_plus':
                     relay_number = 1
