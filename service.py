@@ -11,6 +11,15 @@ from gpiozero import DigitalOutputDevice, BadPinFactory, DigitalInputDevice
 
 from virtual_digital_output_device import VirtualDigitalOutputDevice
 
+'''
+Relay Mapping:
+1: Battery Plus
+2: Battery Minus
+3: Precharge 
+4: Solar String 1
+5: Solar String 2
+'''
+
 
 class Relay:
     def __init__(self, number: int, client: mqtt.Client, pin: int, name: str):
@@ -125,21 +134,34 @@ class GpioService:
 
     def mqtt_on_message(self, client: mqtt.Client, userdata: Any, msg: mqtt.MQTTMessage):
         if msg.topic.startswith('master/relays/'):
-            relay_number = msg.topic[msg.topic.find('/') + 1:msg.topic.rfind('/')]
-            relay_number = relay_number[relay_number.find('/') + 1:]
-            if relay_number.isnumeric():
+            message_topic = msg.topic[msg.topic.find('/') + 1:msg.topic.rfind('/')]
+            relay_string = message_topic[message_topic.find('/') + 1:]
+            relay_number: int = -1
+            if relay_string.isnumeric():
                 relay_number = int(relay_number)
-                if relay_number in self.relays:
-                    if msg.topic.endswith('/set') and len(msg.payload) > 0:
-                        payload = msg.payload.decode()
-                        if payload.lower() == 'on':
-                            self.relays[relay_number].on()
-                        elif payload.lower() == 'off':
-                            self.relays[relay_number].off()
-                    elif msg.topic.endswith('/status'):
-                        self.relays[relay_number].publish_state()
-            if msg.topic == 'master/relays/precharge':
-                threading.Thread(name='precharge', target=self.precharge).start()
+            else:
+                if relay_string == 'battery_plus':
+                    relay_number = 1
+                elif relay_string == 'battery_minus':
+                    relay_number = 2
+                elif relay_string == 'battery_precharge':
+                    relay_number = 3
+                elif relay_string == 'solar_string_1':
+                    relay_number = 4
+                elif relay_string == 'solar_string_2':
+                    relay_number = 5
+
+            if relay_number in self.relays:
+                if msg.topic.endswith('/set') and len(msg.payload) > 0:
+                    payload = msg.payload.decode()
+                    if payload.lower() == 'on':
+                        self.relays[relay_number].on()
+                    elif payload.lower() == 'off':
+                        self.relays[relay_number].off()
+                elif msg.topic.endswith('/status'):
+                    self.relays[relay_number].publish_state()
+        if msg.topic == 'master/relays/perform_precharge':
+            threading.Thread(name='precharge', target=self.precharge).start()
 
 
 if __name__ == '__main__':

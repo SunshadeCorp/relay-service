@@ -4,17 +4,17 @@ kill_switch:
   pin: 16
 relays:
   1:
-    name: Relay 1 - Battery
+    name: Relay 1 - Battery Plus
     pin: 12
   2:
-    name: Relay 2 - Battery
+    name: Relay 2 - Battery Minus
     pin: 13
   3:
     name: Relay 3 - Precharge Battery
     pin: 20
   4:
-    name: Relay 4 - Solar 1
+    name: Relay 4 - Solar String 1
     pin: 19
   5:
-    name: Relay 5 - Solar 2
+    name: Relay 5 - Solar String 2
     pin: 24
