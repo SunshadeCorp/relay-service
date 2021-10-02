@@ -22,10 +22,11 @@ Relay Mapping:
 
 
 class Relay:
-    def __init__(self, number: int, client: mqtt.Client, pin: int, name: str):
+    def __init__(self, number: int, client: mqtt.Client, pin: int, id: str, name: str):
         self.number = number
         self.client = client
         self.pin = pin
+        self.id = id
         self.name = name
         try:
             self.output = DigitalOutputDevice(self.pin)
@@ -35,7 +36,7 @@ class Relay:
 
     @classmethod
     def from_dict(cls, number: int, client: mqtt.Client, relay_dict: Dict):
-        return cls(number, client, relay_dict[number]['pin'], relay_dict[number]['name'])
+        return cls(number, client, relay_dict[number]['pin'], relay_dict[number]['id'], relay_dict[number]['name'])
 
     def on(self):
         if not self.is_active():
@@ -59,6 +60,8 @@ class Relay:
     def subscribe(self):
         self.client.subscribe(f'master/relays/{self.number}/set')
         self.client.subscribe(f'master/relays/{self.number}/status')
+        self.client.subscribe(f'master/relays/{self.id}/set')
+        self.client.subscribe(f'master/relays/{self.id}/status')
 
 
 class GpioService:
@@ -110,7 +113,7 @@ class GpioService:
         for relay_number in self.relays:
             self.relays[relay_number].subscribe()
             self.relays[relay_number].publish_state()
-        self.mqtt_client.subscribe('master/relays/precharge')
+        self.mqtt_client.subscribe('master/relays/perform_precharge')
         self.mqtt_client.publish('master/relays/kill_switch', 'released' if self.kill_switch.is_active else 'pressed',
                                  retain=True)
         self.mqtt_client.publish('master/relays/available', 'online', retain=True)
@@ -140,17 +143,10 @@ class GpioService:
             if relay_string.isnumeric():
                 relay_number = int(relay_string)
             else:
-                if relay_string == 'battery_plus':
-                    relay_number = 1
-                elif relay_string == 'battery_minus':
-                    relay_number = 2
-                elif relay_string == 'battery_precharge':
-                    relay_number = 3
-                elif relay_string == 'solar_string_1':
-                    relay_number = 4
-                elif relay_string == 'solar_string_2':
-                    relay_number = 5
-
+                for relay_num in self.relays:
+                    if self.relays[relay_num].id == relay_string:
+                        relay_number = self.relays[relay_num].number
+                        break
             if relay_number in self.relays:
                 if msg.topic.endswith('/set') and len(msg.payload) > 0:
                     payload = msg.payload.decode()
