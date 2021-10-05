@@ -1,5 +1,6 @@
 credentials.yaml
 mosquitto/
+mqtt_relay_switches.yaml
 ui/*.py
 
 # Created by https://www.toptal.com/developers/gitignore/api/python,pycharm+all
