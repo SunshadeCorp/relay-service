@@ -1,10 +1,11 @@
 import subprocess
 import sys
 import threading
+import urllib.request
 from pathlib import Path
 from subprocess import check_output
 
-import urllib.request
+from tqdm_up_to import TqdmUpTo
 
 
 class MosquittoServer:
@@ -17,8 +18,9 @@ class MosquittoServer:
         self.executable = self.working_dir / Path('mosquitto.exe')
         if not self.executable.is_file():
             if not self.install_file.is_file():
-                print('downloading file...')
-                urllib.request.urlretrieve(self.MOSQUITTO_LINK, self.install_file)
+                with TqdmUpTo(unit='B', unit_scale=True, unit_divisor=1024, miniters=1,
+                              desc=self.install_file.name) as t:
+                    urllib.request.urlretrieve(self.MOSQUITTO_LINK, self.install_file, reporthook=t.update_to)
             print(check_output(f'7z e -o{self.working_dir}/ {self.install_file}', shell=True).decode())
             self.install_file.unlink()
         self.thread = None
