@@ -1,4 +1,4 @@
-#credentials.yaml
+credentials.yaml
 mosquitto/
 mqtt_relay_switches.yaml
 ui/*.py
