@@ -1,16 +1,16 @@
 mqtt_server: mosquitto
 mqtt_port: 1883
 kill_switch:
-  pin: 16
+  pin: 7
 relays:
   1:
     id: battery_plus
     name: Relay 1 - Battery Plus
-    pin: 12
+    pin: 29
   2:
     id: battery_minus
     name: Relay 2 - Battery Minus
-    pin: 13
+    pin: 31
   3:
     id: battery_precharge
     name: Relay 3 - Precharge Battery
