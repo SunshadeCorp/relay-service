@@ -66,7 +66,6 @@ class Relay:
 
 class GpioService:
     def __init__(self):
-        print("Starting GPIO Service", flush=True)
         config = self.get_config('config.yaml')
         credentials = self.get_config('credentials.yaml')
         self.relays = config['relays']
@@ -84,7 +83,6 @@ class GpioService:
 
         self.mqtt_client.username_pw_set(credentials['username'], credentials['password'])
         self.mqtt_client.will_set('master/relays/available', 'offline', retain=True)
-        print("Connecting to MQTT", flush=True)
         self.mqtt_client.connect(host=config['mqtt_server'], port=config['mqtt_port'], keepalive=60)
 
     def kill_switch_pressed(self):
@@ -138,7 +136,6 @@ class GpioService:
                         self.kill_switch_pressed()
 
     def mqtt_on_message(self, client: mqtt.Client, userdata: Any, msg: mqtt.MQTTMessage):
-        print("Got MQTT message", flush=True)
         if msg.topic.startswith('master/relays/'):
             message_topic = msg.topic[msg.topic.find('/') + 1:msg.topic.rfind('/')]
             relay_string = message_topic[message_topic.find('/') + 1:]
