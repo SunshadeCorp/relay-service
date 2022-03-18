@@ -33,6 +33,12 @@ class Relay:
         except BadPinFactory as e:
             print(f'{e}')
             self.output = VirtualDigitalOutputDevice(self.pin)
+        
+        try:
+            self.toggle_input = DigitalInputDevice(self.toggle_pin, pull_up=False, bounce_time=0.1)
+            self.toggle_input.when_activated = self.toggle
+        except BadPinFactory as e:
+            print(f'{e}')
 
     @classmethod
     def from_dict(cls, number: int, client: mqtt.Client, relay_dict: Dict):
@@ -46,6 +52,13 @@ class Relay:
     def off(self):
         if self.is_active():
             self.output.off()
+        self.publish_state()
+
+    def toggle(self):
+        if self.is_active():
+            self.output.off()
+        else:
+            self.output.on()
         self.publish_state()
 
     def is_active(self):
