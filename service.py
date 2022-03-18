@@ -22,10 +22,11 @@ Relay Mapping:
 
 
 class Relay:
-    def __init__(self, number: int, client: mqtt.Client, pin: int, id: str, name: str):
+    def __init__(self, number: int, client: mqtt.Client, pin: int, toggle_pin: int, id: str, name: str):
         self.number = number
         self.client = client
         self.pin = pin
+        self.toggle_pin = toggle_pin
         self.id = id
         self.name = name
         try:
@@ -33,10 +34,16 @@ class Relay:
         except BadPinFactory as e:
             print(f'{e}')
             self.output = VirtualDigitalOutputDevice(self.pin)
+        
+        try:
+            self.toggle_input = DigitalInputDevice(self.toggle_pin, pull_up=False, bounce_time=0.1)
+            self.toggle_input.when_activated = self.toggle
+        except BadPinFactory as e:
+            print(f'{e}')
 
     @classmethod
     def from_dict(cls, number: int, client: mqtt.Client, relay_dict: Dict):
-        return cls(number, client, relay_dict[number]['pin'], relay_dict[number]['id'], relay_dict[number]['name'])
+        return cls(number, client, relay_dict[number]['pin'], relay_dict[number]['toggle_pin'],relay_dict[number]['id'], relay_dict[number]['name'])
 
     def on(self):
         if not self.is_active():
@@ -46,6 +53,13 @@ class Relay:
     def off(self):
         if self.is_active():
             self.output.off()
+        self.publish_state()
+
+    def toggle(self):
+        if self.is_active():
+            self.output.off()
+        else:
+            self.output.on()
         self.publish_state()
 
     def is_active(self):
