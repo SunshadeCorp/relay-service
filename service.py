@@ -56,6 +56,7 @@ class Relay:
         self.publish_state()
 
     def toggle(self):
+        print("Toggle Relay", flush=True)
         if self.is_active():
             self.output.off()
         else:
