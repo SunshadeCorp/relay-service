@@ -36,7 +36,7 @@ class Relay:
             self.output = VirtualDigitalOutputDevice(self.pin)
         
         try:
-            self.toggle_input = DigitalInputDevice(self.toggle_pin, pull_up=False, bounce_time=0.1)
+            self.toggle_input = DigitalInputDevice(self.toggle_pin, pull_up=False, bounce_time=0.03)
             self.toggle_input.when_activated = self.toggle
         except BadPinFactory as e:
             print(f'{e}')
