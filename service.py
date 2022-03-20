@@ -50,7 +50,7 @@ class Relay:
     def on(self):
         # Don't allow activating relay outputs when kill switch is pressed
         # Kill switch input active = 12v is on = kill switch not pressed
-        if not self.is_active() and self.kill_switch.is_active():
+        if not self.is_active() and self.kill_switch.is_active:
             self.output.on()
         self.publish_state()
 
