@@ -102,7 +102,7 @@ class GpioService:
         self.kill_switch.when_deactivated = self.kill_switch_pressed
 
         for relay_number in self.relays:
-            self.relays[relay_number] = Relay.from_dict(relay_number, self.mqtt_client, self.relays)
+            self.relays[relay_number] = Relay.from_dict(relay_number, self.mqtt_client, self.kill_switch, self.relays)
 
         self.mqtt_client.username_pw_set(credentials['username'], credentials['password'])
         self.mqtt_client.will_set('master/relays/available', 'offline', retain=True)
