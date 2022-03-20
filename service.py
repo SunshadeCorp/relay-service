@@ -22,9 +22,10 @@ Relay Mapping:
 
 
 class Relay:
-    def __init__(self, number: int, client: mqtt.Client, pin: int, toggle_pin: int, id: str, name: str):
+    def __init__(self, number: int, client: mqtt.Client, kill_switch: DigitalInputDevice, pin: int, toggle_pin: int, id: str, name: str):
         self.number = number
         self.client = client
+        self.kill_switch = kill_switch
         self.pin = pin
         self.toggle_pin = toggle_pin
         self.id = id
@@ -43,11 +44,13 @@ class Relay:
             print(f'{e}')
 
     @classmethod
-    def from_dict(cls, number: int, client: mqtt.Client, relay_dict: Dict):
-        return cls(number, client, relay_dict[number]['pin'], relay_dict[number]['toggle_pin'],relay_dict[number]['id'], relay_dict[number]['name'])
+    def from_dict(cls, number: int, client: mqtt.Client, relay_dict: Dict, kill_switch: DigitalInputDevice):
+        return cls(number, client, kill_switch, relay_dict[number]['pin'], relay_dict[number]['toggle_pin'],relay_dict[number]['id'], relay_dict[number]['name'])
 
     def on(self):
-        if not self.is_active():
+        # Don't allow activating relay outputs when kill switch is pressed
+        # Kill switch input active = 12v is on = kill switch not pressed
+        if not self.is_active() and self.kill_switch.is_active():
             self.output.on()
         self.publish_state()
 
