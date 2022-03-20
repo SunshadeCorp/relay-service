@@ -64,7 +64,8 @@ class Relay:
         if self.is_active():
             self.output.off()
         else:
-            self.output.on()
+            if self.kill_switch.is_active:
+                self.output.on()
         self.publish_state()
 
     def toggle_deactivated(self):
