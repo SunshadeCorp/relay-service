@@ -39,7 +39,6 @@ class Relay:
         try:
             self.toggle_input = DigitalInputDevice(self.toggle_pin, pull_up=False)
             self.toggle_input.when_activated = self.toggle
-            self.toggle_input.when_deactivated = self.toggle_deactivated
         except BadPinFactory as e:
             print(f'{e}')
 
@@ -67,9 +66,6 @@ class Relay:
             if self.kill_switch.is_active:
                 self.output.on()
         self.publish_state()
-
-    def toggle_deactivated(self):
-        print("Toggle Relay Unpressed", flush=True)
 
     def is_active(self):
         return self.output.is_active
