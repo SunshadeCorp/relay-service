@@ -22,10 +22,12 @@ Relay Mapping:
 
 
 class Relay:
-    def __init__(self, number: int, client: mqtt.Client, pin: int, id: str, name: str):
+    def __init__(self, number: int, client: mqtt.Client, kill_switch: DigitalInputDevice, pin: int, toggle_pin: int, id: str, name: str):
         self.number = number
         self.client = client
+        self.kill_switch = kill_switch
         self.pin = pin
+        self.toggle_pin = toggle_pin
         self.id = id
         self.name = name
         try:
@@ -33,19 +35,36 @@ class Relay:
         except BadPinFactory as e:
             print(f'{e}')
             self.output = VirtualDigitalOutputDevice(self.pin)
+        
+        try:
+            self.toggle_input = DigitalInputDevice(self.toggle_pin, pull_up=False)
+            self.toggle_input.when_activated = self.toggle
+        except BadPinFactory as e:
+            print(f'{e}')
 
     @classmethod
-    def from_dict(cls, number: int, client: mqtt.Client, relay_dict: Dict):
-        return cls(number, client, relay_dict[number]['pin'], relay_dict[number]['id'], relay_dict[number]['name'])
+    def from_dict(cls, number: int, client: mqtt.Client, kill_switch: DigitalInputDevice, relay_dict: Dict):
+        return cls(number, client, kill_switch, relay_dict[number]['pin'], relay_dict[number]['toggle_pin'],relay_dict[number]['id'], relay_dict[number]['name'])
 
     def on(self):
-        if not self.is_active():
+        # Don't allow activating relay outputs when kill switch is pressed
+        # Kill switch input active = 12v is on = kill switch not pressed
+        if not self.is_active() and self.kill_switch.is_active:
             self.output.on()
         self.publish_state()
 
     def off(self):
         if self.is_active():
             self.output.off()
+        self.publish_state()
+
+    def toggle(self):
+        print("Toggle Relay", flush=True)
+        if self.is_active():
+            self.output.off()
+        else:
+            if self.kill_switch.is_active:
+                self.output.on()
         self.publish_state()
 
     def is_active(self):
@@ -66,6 +85,7 @@ class Relay:
 
 class GpioService:
     def __init__(self):
+        print("Starting GPIO Service", flush=True)
         config = self.get_config('config.yaml')
         credentials = self.get_config('credentials.yaml')
         self.relays = config['relays']
@@ -74,15 +94,16 @@ class GpioService:
         self.mqtt_client.on_connect = self.mqtt_on_connect
         self.mqtt_client.on_message = self.mqtt_on_message
 
-        self.kill_switch = DigitalInputDevice(config['kill_switch']['pin'], pull_up=False, bounce_time=0.1)
+        self.kill_switch = DigitalInputDevice(config['kill_switch']['pin'], pull_up=False)
         self.kill_switch.when_activated = self.kill_switch_released
         self.kill_switch.when_deactivated = self.kill_switch_pressed
 
         for relay_number in self.relays:
-            self.relays[relay_number] = Relay.from_dict(relay_number, self.mqtt_client, self.relays)
+            self.relays[relay_number] = Relay.from_dict(relay_number, self.mqtt_client, self.kill_switch, self.relays)
 
         self.mqtt_client.username_pw_set(credentials['username'], credentials['password'])
         self.mqtt_client.will_set('master/relays/available', 'offline', retain=True)
+        print("Connecting to MQTT", flush=True)
         self.mqtt_client.connect(host=config['mqtt_server'], port=config['mqtt_port'], keepalive=60)
 
     def kill_switch_pressed(self):
@@ -136,6 +157,7 @@ class GpioService:
                         self.kill_switch_pressed()
 
     def mqtt_on_message(self, client: mqtt.Client, userdata: Any, msg: mqtt.MQTTMessage):
+        print("Got MQTT message", flush=True)
         if msg.topic.startswith('master/relays/'):
             message_topic = msg.topic[msg.topic.find('/') + 1:msg.topic.rfind('/')]
             relay_string = message_topic[message_topic.find('/') + 1:]
