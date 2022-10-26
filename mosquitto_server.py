@@ -9,7 +9,7 @@ from tqdm_up_to import TqdmUpTo
 
 
 class MosquittoServer:
-    MOSQUITTO_LINK = 'https://mosquitto.org/files/binary/win64/mosquitto-2.0.12-install-windows-x64.exe'
+    MOSQUITTO_LINK = 'https://mosquitto.org/files/binary/win64/mosquitto-2.0.15-install-windows-x64.exe'
 
     def __init__(self):
         script_dir = Path(__file__).parent

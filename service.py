@@ -22,7 +22,8 @@ Relay Mapping:
 
 
 class Relay:
-    def __init__(self, number: int, client: mqtt.Client, kill_switch: DigitalInputDevice, pin: int, toggle_pin: int, id: str, name: str):
+    def __init__(self, number: int, client: mqtt.Client, kill_switch: DigitalInputDevice, pin: int, toggle_pin: int,
+                 id: str, name: str):
         self.number = number
         self.client = client
         self.kill_switch = kill_switch
@@ -35,16 +36,18 @@ class Relay:
         except BadPinFactory as e:
             print(f'{e}')
             self.output = VirtualDigitalOutputDevice(self.pin)
-        
-        try:
-            self.toggle_input = DigitalInputDevice(self.toggle_pin, pull_up=False)
-            self.toggle_input.when_activated = self.toggle
-        except BadPinFactory as e:
-            print(f'{e}')
+
+        if self.toggle_pin != -1:
+            try:
+                self.toggle_input = DigitalInputDevice(self.toggle_pin, pull_up=False)
+                self.toggle_input.when_activated = self.toggle
+            except BadPinFactory as e:
+                print(f'{e}')
 
     @classmethod
     def from_dict(cls, number: int, client: mqtt.Client, kill_switch: DigitalInputDevice, relay_dict: Dict):
-        return cls(number, client, kill_switch, relay_dict[number]['pin'], relay_dict[number]['toggle_pin'],relay_dict[number]['id'], relay_dict[number]['name'])
+        return cls(number, client, kill_switch, relay_dict[number]['pin'], relay_dict[number].get('toggle_pin', -1),
+                   relay_dict[number]['id'], relay_dict[number]['name'])
 
     def on(self):
         # Don't allow activating relay outputs when kill switch is pressed
@@ -94,7 +97,8 @@ class GpioService:
         self.mqtt_client.on_connect = self.mqtt_on_connect
         self.mqtt_client.on_message = self.mqtt_on_message
 
-        self.kill_switch = DigitalInputDevice(config['kill_switch']['pin'], pull_up=False)
+        self.kill_switch = DigitalInputDevice(config['kill_switch']['pin'], pull_up=False,
+                                              bounce_time=config['kill_switch'].get('bounce_time', None))
         self.kill_switch.when_activated = self.kill_switch_released
         self.kill_switch.when_deactivated = self.kill_switch_pressed
 
