@@ -27,9 +27,9 @@ class MosquittoServer:
 
     def run(self, daemon=False):
         if daemon:
-            process = subprocess.Popen(f'{self.executable} -v', cwd=self.working_dir)
+            process = subprocess.Popen(f'{self.executable} -v -c mosquitto.conf', cwd=self.working_dir)
         else:
-            process = subprocess.Popen(f'{self.executable} -v', cwd=self.working_dir,
+            process = subprocess.Popen(f'{self.executable} -v -c mosquitto.conf', cwd=self.working_dir,
                                        stdout=sys.stdout, stderr=sys.stderr)
         process.wait()
 
