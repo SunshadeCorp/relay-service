@@ -17,7 +17,6 @@ def to_home_assistant():
     target_dict = {'switch': []}
     for relay_number in content['relays']:
         target_dict['switch'].append({
-            'platform': 'mqtt',
             'command_topic': f'master/relays/{relay_number}/set',
             'payload_off': 'off',
             'payload_on': 'on',
