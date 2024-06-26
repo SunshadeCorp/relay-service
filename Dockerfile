@@ -1,8 +1,10 @@
-FROM python:3-buster
+FROM python:3.12-bookworm
 
 WORKDIR /usr/src/app
 
-RUN pip install RPi.GPIO~=0.7.0 pigpio~=1.78 gpiozero~=1.6.2 paho-mqtt~=1.5.1 PyYAML~=5.4.1
+COPY requirements.txt requirements.pi.txt ./
+
+RUN pip install --no-cache-dir --prefer-binary -r requirements.pi.txt
 
 COPY . .
 

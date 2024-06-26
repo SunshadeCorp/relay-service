@@ -93,7 +93,7 @@ class GpioService:
         credentials = self.get_config('credentials.yaml')
         self.relays = config['relays']
         self.precharge_lock = Lock()
-        self.mqtt_client = mqtt.Client()
+        self.mqtt_client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
         self.mqtt_client.on_connect = self.mqtt_on_connect
         self.mqtt_client.on_message = self.mqtt_on_message
 
@@ -108,7 +108,7 @@ class GpioService:
         self.mqtt_client.username_pw_set(credentials['username'], credentials['password'])
         self.mqtt_client.will_set('master/relays/available', 'offline', retain=True)
         print("Connecting to MQTT", flush=True)
-        self.mqtt_client.connect(host=config['mqtt_server'], port=config['mqtt_port'], keepalive=60)
+        self.mqtt_client.connect(host=config['mqtt_server'], port=config['mqtt_port'])
 
     def kill_switch_pressed(self):
         for relay_number in self.relays:
@@ -134,7 +134,7 @@ class GpioService:
     def loop_as_daemon(self):
         self.mqtt_client.loop_start()
 
-    def mqtt_on_connect(self, client: mqtt.Client, userdata: Any, flags: Dict, rc: int):
+    def mqtt_on_connect(self, client, userdata, flags, reason_code, properties):
         for relay_number in self.relays:
             self.relays[relay_number].subscribe()
             self.relays[relay_number].publish_state()
